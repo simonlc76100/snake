@@ -32,34 +32,38 @@ function createSnake(gameMatrix, snake) {
 
 function moveRight(gameMatrix, snake) {
   gameMatrix[snake.i][snake.j] = 0;
-
+  snake.previousI = snake.i;
+  snake.previousJ = snake.j;
   snake.j += 1;
   gameMatrix[snake.i][snake.j] = 1;
-  console.log(gameMatrix);
+  console.log(snake);
 }
 
 function moveleft(gameMatrix, snake) {
   gameMatrix[snake.i][snake.j] = 0;
-
+  snake.previousI = snake.i;
+  snake.previousJ = snake.j;
   snake.j -= 1;
   gameMatrix[snake.i][snake.j] = 1;
-  console.log(gameMatrix);
+  console.log(snake);
 }
 
 function moveUp(gameMatrix, snake) {
   gameMatrix[snake.i][snake.j] = 0;
-
+  snake.previousI = snake.i;
+  snake.previousJ = snake.j;
   snake.i -= 1;
   gameMatrix[snake.i][snake.j] = 1;
-  console.log(gameMatrix);
+  console.log(snake);
 }
 
 function moveDown(gameMatrix, snake) {
   gameMatrix[snake.i][snake.j] = 0;
-
+  snake.previousI = snake.i;
+  snake.previousJ = snake.j;
   snake.i += 1;
   gameMatrix[snake.i][snake.j] = 1;
-  console.log(gameMatrix);
+  console.log(snake);
 }
 
 function movesHandler(gameMatrix, snake) {
@@ -81,8 +85,6 @@ function movesHandler(gameMatrix, snake) {
   });
 }
 
-function updateGame(gameMatrix)
-
 function main() {
   let rows = 50;
   let cellsPerRow = 80;
@@ -90,6 +92,8 @@ function main() {
   let snake = {
     i: 10,
     j: 10,
+    previousI: 0,
+    previousJ: 0,
   };
 
   createGameWindow(rows, cellsPerRow);
