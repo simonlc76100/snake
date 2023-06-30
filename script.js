@@ -28,7 +28,14 @@ function getGameMatrix(cells, rows, cellsPerRow) {
 
 function createSnake(gameMatrix, snake) {
   gameMatrix[snake.i][snake.j] = 1;
-  console.log("initial snake pos", gameMatrix);
+}
+
+function moveRight(gameMatrix, snake) {
+  gameMatrix[snake.i][snake.j] = 0;
+
+  snake.j += 1;
+  gameMatrix[snake.i][snake.j] = 1;
+  console.log(gameMatrix);
 }
 
 function main() {
@@ -36,8 +43,8 @@ function main() {
   let cellsPerRow = 80;
 
   let snake = {
-    i: 9,
-    j: 9,
+    i: 10,
+    j: 10,
   };
 
   createGameWindow(rows, cellsPerRow);
@@ -45,6 +52,13 @@ function main() {
   let gameMatrix = getGameMatrix(cells, rows, cellsPerRow);
 
   createSnake(gameMatrix, snake);
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight") {
+      moveRight(gameMatrix, snake);
+    }
+    console.log(gameMatrix);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", main);
