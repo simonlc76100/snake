@@ -1,107 +1,110 @@
-function createGameWindow(rows, cellsPerRow) {
-  const game = document.getElementById("game-window");
-  for (let i = 0; i < rows; i++) {
-    const row = game.insertRow(i);
+function createGameWindow(game) {
+  const window = document.getElementById("game-window");
+  for (let i = 0; i < game.rows; i++) {
+    const row = window.insertRow(i);
     row.id = "row_" + i;
-    for (let j = 0; j < cellsPerRow; j++) {
+    for (let j = 0; j < game.cellsPerRow; j++) {
       const cell = row.insertCell(j);
       cell.id = "cell_" + i + "_" + j;
     }
   }
 }
 
-function getGameMatrix(cells, rows, cellsPerRow) {
-  let gameMatrix = new Array(rows)
+function getGameMatrix(game) {
+  let gameMatrix = new Array(game.rows)
     .fill()
-    .map(() => new Array(cellsPerRow).fill(0));
+    .map(() => new Array(game.cellsPerRow).fill(0));
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cellsPerRow; j++) {
-      if (cells[i * cellsPerRow + j].textContent === "") gameMatrix[i][j] = 0;
+  for (let i = 0; i < game.rows; i++) {
+    for (let j = 0; j < game.cellsPerRow; j++) {
+      if (game.cells[i * game.cellsPerRow + j].textContent === "")
+        gameMatrix[i][j] = 0;
       else {
-        gameMatrix[i][j] = cells[i * cellsPerRow + j].textContent;
+        gameMatrix[i][j] = game.cells[i * game.cellsPerRow + j].textContent;
       }
     }
   }
   return gameMatrix;
 }
 
-function createSnake(gameMatrix, snake) {
-  gameMatrix[snake.i][snake.j] = 1;
+function createSnake(game) {
+  game.matrix[game.snake.i][game.snake.j] = 1;
 }
 
-function moveRight(gameMatrix, snake) {
-  gameMatrix[snake.i][snake.j] = 0;
-  snake.previousI = snake.i;
-  snake.previousJ = snake.j;
-  snake.j += 1;
-  gameMatrix[snake.i][snake.j] = 1;
-  console.log(snake);
+function moveSnake(game, direction) {
+  game.matrix[game.snake.i][game.snake.j] = 0;
+  game.snake.previousI = game.snake.i;
+  game.snake.previousJ = game.snake.j;
+
+  switch (direction) {
+    case "right":
+      game.snake.j += 1;
+      break;
+    case "left":
+      game.snake.j -= 1;
+      break;
+    case "up":
+      game.snake.i -= 1;
+      break;
+    case "down":
+      game.snake.i += 1;
+      break;
+  }
+  game.matrix[game.snake.i][game.snake.j] = 1;
+  console.log(game.matrix);
+  updateGame(game);
 }
 
-function moveleft(gameMatrix, snake) {
-  gameMatrix[snake.i][snake.j] = 0;
-  snake.previousI = snake.i;
-  snake.previousJ = snake.j;
-  snake.j -= 1;
-  gameMatrix[snake.i][snake.j] = 1;
-  console.log(snake);
+function updateGame(game) {
+  let previousCell =
+    game.cells[game.snake.previousI * game.cellsPerRow + game.snake.previousJ];
+  let cell = game.cells[game.snake.i * game.cellsPerRow + game.snake.j];
+
+  if (previousCell.classList.contains("snake")) {
+    previousCell.classList.remove("snake");
+  }
+  cell.classList.add("snake");
 }
 
-function moveUp(gameMatrix, snake) {
-  gameMatrix[snake.i][snake.j] = 0;
-  snake.previousI = snake.i;
-  snake.previousJ = snake.j;
-  snake.i -= 1;
-  gameMatrix[snake.i][snake.j] = 1;
-  console.log(snake);
-}
-
-function moveDown(gameMatrix, snake) {
-  gameMatrix[snake.i][snake.j] = 0;
-  snake.previousI = snake.i;
-  snake.previousJ = snake.j;
-  snake.i += 1;
-  gameMatrix[snake.i][snake.j] = 1;
-  console.log(snake);
-}
-
-function movesHandler(gameMatrix, snake) {
+function movesHandler(game) {
   document.addEventListener("keydown", function (event) {
     switch (event.key) {
       case "ArrowRight":
-        moveRight(gameMatrix, snake);
+        moveSnake(game, "right");
         break;
       case "ArrowLeft":
-        moveleft(gameMatrix, snake);
+        moveSnake(game, "left");
         break;
       case "ArrowUp":
-        moveUp(gameMatrix, snake);
+        moveSnake(game, "up");
         break;
       case "ArrowDown":
-        moveDown(gameMatrix, snake);
+        moveSnake(game, "down");
         break;
     }
   });
 }
 
 function main() {
-  let rows = 50;
-  let cellsPerRow = 80;
-
-  let snake = {
-    i: 10,
-    j: 10,
-    previousI: 0,
-    previousJ: 0,
+  let game = {
+    rows: 50,
+    cellsPerRow: 80,
+    snake: {
+      i: 10,
+      j: 10,
+      previousI: 0,
+      previousJ: 0,
+    },
+    cells: [],
+    matrix: [],
   };
 
-  createGameWindow(rows, cellsPerRow);
-  const cells = document.querySelectorAll('td[id^="cell_"]');
-  let gameMatrix = getGameMatrix(cells, rows, cellsPerRow);
+  createGameWindow(game);
+  game.cells = document.querySelectorAll('td[id^="cell_"]');
+  game.matrix = getGameMatrix(game);
 
-  createSnake(gameMatrix, snake);
-  movesHandler(gameMatrix, snake);
+  createSnake(game);
+  movesHandler(game);
 }
 
 document.addEventListener("DOMContentLoaded", main);

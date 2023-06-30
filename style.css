@@ -23,3 +23,7 @@ body {
   border: 1px solid #dddddd;
   box-sizing: border-box;
 }
+
+.snake {
+  background-color: green;
+}
