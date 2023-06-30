@@ -54,6 +54,14 @@ function moveUp(gameMatrix, snake) {
   console.log(gameMatrix);
 }
 
+function moveDown(gameMatrix, snake) {
+  gameMatrix[snake.i][snake.j] = 0;
+
+  snake.i += 1;
+  gameMatrix[snake.i][snake.j] = 1;
+  console.log(gameMatrix);
+}
+
 function movesHandler(gameMatrix, snake) {
   document.addEventListener("keydown", function (event) {
     switch (event.key) {
@@ -66,9 +74,14 @@ function movesHandler(gameMatrix, snake) {
       case "ArrowUp":
         moveUp(gameMatrix, snake);
         break;
+      case "ArrowDown":
+        moveDown(gameMatrix, snake);
+        break;
     }
   });
 }
+
+function updateGame(gameMatrix)
 
 function main() {
   let rows = 50;
