@@ -38,6 +38,27 @@ function moveRight(gameMatrix, snake) {
   console.log(gameMatrix);
 }
 
+function moveleft(gameMatrix, snake) {
+  gameMatrix[snake.i][snake.j] = 0;
+
+  snake.j -= 1;
+  gameMatrix[snake.i][snake.j] = 1;
+  console.log(gameMatrix);
+}
+
+function movesHandler(gameMatrix, snake) {
+  document.addEventListener("keydown", function (event) {
+    switch (event.key) {
+      case "ArrowRight":
+        moveRight(gameMatrix, snake);
+        break;
+      case "ArrowLeft":
+        moveleft(gameMatrix, snake);
+        break;
+    }
+  });
+}
+
 function main() {
   let rows = 50;
   let cellsPerRow = 80;
@@ -52,13 +73,7 @@ function main() {
   let gameMatrix = getGameMatrix(cells, rows, cellsPerRow);
 
   createSnake(gameMatrix, snake);
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "ArrowRight") {
-      moveRight(gameMatrix, snake);
-    }
-    console.log(gameMatrix);
-  });
+  movesHandler(gameMatrix, snake);
 }
 
 document.addEventListener("DOMContentLoaded", main);
