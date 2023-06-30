@@ -18,8 +18,8 @@ body {
 }
 
 #game-window > tbody > tr > td {
-  height: 25px;
-  width: 25px;
+  height: 15px;
+  width: 15px;
   border: 1px solid #dddddd;
   box-sizing: border-box;
 }
