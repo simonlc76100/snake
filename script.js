@@ -29,6 +29,14 @@ function getGameMatrix(game) {
 
 function createSnake(game) {
   game.matrix[game.snake.i][game.snake.j] = 1;
+  console.log(game.snake);
+  updateGame(game);
+}
+
+function createApple(game) {
+  game.matrix[game.apple.i][game.apple.j] = 1;
+  console.log(game.snake);
+  updateGame(game);
 }
 
 function moveSnake(game, direction) {
@@ -50,8 +58,8 @@ function moveSnake(game, direction) {
       game.snake.i += 1;
       break;
   }
-  game.matrix[game.snake.i][game.snake.j] = 1;
-  console.log(game.matrix);
+  game.matrix[game.snake.i][game.snake.j] = 2;
+  console.log(game.apple);
   updateGame(game);
 }
 
@@ -64,6 +72,10 @@ function updateGame(game) {
     previousCell.classList.remove("snake");
   }
   cell.classList.add("snake");
+
+  game.cells[game.apple.i * game.cellsPerRow + game.apple.j].classList.add(
+    "apple"
+  );
 }
 
 function movesHandler(game) {
@@ -94,6 +106,10 @@ function main() {
       j: 10,
       previousI: 0,
       previousJ: 0,
+    },
+    apple: {
+      i: 25,
+      j: 40,
     },
     cells: [],
     matrix: [],
