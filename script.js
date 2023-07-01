@@ -29,13 +29,16 @@ function getGameMatrix(game) {
 
 function createSnake(game) {
   game.matrix[game.snake.i][game.snake.j] = 1;
-  console.log(game.snake);
   updateGame(game);
 }
 
 function createApple(game) {
-  game.matrix[game.apple.i][game.apple.j] = 1;
-  console.log(game.snake);
+  do {
+    game.apple.i = Math.floor(Math.random() * game.rows);
+    game.apple.j = Math.floor(Math.random() * game.cellsPerRow);
+  } while (game.snake.i === game.apple.i && game.snake.j === game.apple.j);
+
+  game.matrix[game.apple.i][game.apple.j] = 2;
   updateGame(game);
 }
 
@@ -58,8 +61,7 @@ function moveSnake(game, direction) {
       game.snake.i += 1;
       break;
   }
-  game.matrix[game.snake.i][game.snake.j] = 2;
-  console.log(game.apple);
+  game.matrix[game.snake.i][game.snake.j] = 1;
   updateGame(game);
 }
 
@@ -73,25 +75,26 @@ function updateGame(game) {
   }
   cell.classList.add("snake");
 
-  game.cells[game.apple.i * game.cellsPerRow + game.apple.j].classList.add(
-    "apple"
-  );
+  if (game.apple.i !== null && game.apple.j !== null)
+    game.cells[game.apple.i * game.cellsPerRow + game.apple.j].classList.add(
+      "apple"
+    );
 }
 
 function movesHandler(game) {
   document.addEventListener("keydown", function (event) {
     switch (event.key) {
       case "ArrowRight":
-        moveSnake(game, "right");
+        game.snake.direction = "right";
         break;
       case "ArrowLeft":
-        moveSnake(game, "left");
+        game.snake.direction = "left";
         break;
       case "ArrowUp":
-        moveSnake(game, "up");
+        game.snake.direction = "up";
         break;
       case "ArrowDown":
-        moveSnake(game, "down");
+        game.snake.direction = "down";
         break;
     }
   });
@@ -106,10 +109,11 @@ function main() {
       j: 10,
       previousI: 0,
       previousJ: 0,
+      direction: null,
     },
     apple: {
-      i: 25,
-      j: 40,
+      i: null,
+      j: null,
     },
     cells: [],
     matrix: [],
@@ -121,6 +125,12 @@ function main() {
 
   createSnake(game);
   movesHandler(game);
+  createApple(game);
+
+  function gameLoop(game) {
+    moveSnake(game, game.snake.direction);
+  }
+  setInterval(() => gameLoop(game), 50);
 }
 
 document.addEventListener("DOMContentLoaded", main);
