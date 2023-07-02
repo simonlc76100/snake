@@ -2,10 +2,8 @@ function createGameWindow(game) {
   const window = document.getElementById("game-window");
   for (let i = 0; i < game.rows; i++) {
     const row = window.insertRow(i);
-    row.id = "row_" + i;
     for (let j = 0; j < game.cellsPerRow; j++) {
-      const cell = row.insertCell(j);
-      cell.id = "cell_" + i + "_" + j;
+      row.insertCell(j);
     }
   }
 }
@@ -15,21 +13,27 @@ function getGameMatrix(game) {
     .fill()
     .map(() => new Array(game.cellsPerRow).fill(0));
 
-  for (let i = 0; i < game.rows; i++) {
-    for (let j = 0; j < game.cellsPerRow; j++) {
-      if (game.cells[i * game.cellsPerRow + j].textContent === "")
-        gameMatrix[i][j] = 0;
-      else {
-        gameMatrix[i][j] = game.cells[i * game.cellsPerRow + j].textContent;
-      }
-    }
-  }
   return gameMatrix;
 }
 
+function getDomMatrix(game) {
+  let domMatrix = new Array(game.rows)
+    .fill()
+    .map(() => new Array(game.cellsPerRow));
+
+  for (let i = 0; i < game.rows; i++) {
+    for (let j = 0; j < game.cellsPerRow; j++) {
+      domMatrix[i][j] = game.cells[i * game.cellsPerRow + j];
+    }
+  }
+
+  return domMatrix;
+}
+
 function createSnake(game) {
-  game.matrix[game.snake.i][game.snake.j] = 1;
-  updateGame(game);
+  game.gameMatrix[game.snake.i][game.snake.j] = 1;
+
+  renderGame(game);
 }
 
 function createApple(game) {
@@ -38,12 +42,12 @@ function createApple(game) {
     game.apple.j = Math.floor(Math.random() * game.cellsPerRow);
   } while (game.snake.i === game.apple.i && game.snake.j === game.apple.j);
 
-  game.matrix[game.apple.i][game.apple.j] = 2;
-  updateGame(game);
+  game.gameMatrix[game.apple.i][game.apple.j] = 2;
+
+  renderGame(game);
 }
 
 function moveSnake(game, direction) {
-  game.matrix[game.snake.i][game.snake.j] = 0;
   game.snake.previousI = game.snake.i;
   game.snake.previousJ = game.snake.j;
   game.snake.nextI = game.snake.i;
@@ -66,27 +70,32 @@ function moveSnake(game, direction) {
 
   isSnakeValid(game);
   if (game.collision) return;
+  game.gameMatrix[game.snake.i][game.snake.j] = 0;
+
+  if (game.snake.nextI === game.apple.i && game.snake.nextJ === game.apple.j)
+    createApple(game);
 
   game.snake.i = game.snake.nextI;
   game.snake.j = game.snake.nextJ;
-  game.matrix[game.snake.i][game.snake.j] = 1;
-  updateGame(game);
+  game.gameMatrix[game.snake.i][game.snake.j] = 1;
+
+  renderGame(game);
 }
 
-function updateGame(game) {
-  let previousCell =
-    game.cells[game.snake.previousI * game.cellsPerRow + game.snake.previousJ];
-  let cell = game.cells[game.snake.i * game.cellsPerRow + game.snake.j];
-
-  if (previousCell.classList.contains("snake")) {
-    previousCell.classList.remove("snake");
+function renderGame(game) {
+  for (let i = 0; i < game.rows; i++) {
+    for (let j = 0; j < game.cellsPerRow; j++) {
+      game.domMatrix[i][j].classList.remove("snake", "apple");
+      switch (game.gameMatrix[i][j]) {
+        case 1:
+          game.domMatrix[i][j].classList.add("snake");
+          break;
+        case 2:
+          game.domMatrix[i][j].classList.add("apple");
+          break;
+      }
+    }
   }
-  cell.classList.add("snake");
-
-  if (game.apple.i !== null && game.apple.j !== null)
-    game.cells[game.apple.i * game.cellsPerRow + game.apple.j].classList.add(
-      "apple"
-    );
 }
 
 function movesHandler(game) {
@@ -109,16 +118,19 @@ function movesHandler(game) {
 }
 
 function isSnakeValid(game) {
-  if (game.snake.nextJ > game.cellsPerRow - 1 || game.snake.nextJ < 0)
-    game.collision = true;
-  if (game.snake.nextI > game.rows - 1 || game.snake.nextI < 0)
+  if (
+    game.snake.nextJ > game.cellsPerRow - 1 ||
+    game.snake.nextJ < 0 ||
+    game.snake.nextI > game.rows - 1 ||
+    game.snake.nextI < 0
+  )
     game.collision = true;
 }
 
 function main() {
   let game = {
-    rows: 50,
-    cellsPerRow: 80,
+    rows: 30,
+    cellsPerRow: 40,
     snake: {
       i: 10,
       j: 10,
@@ -133,13 +145,16 @@ function main() {
       j: null,
     },
     cells: [],
-    matrix: [],
+    domMatrix: [],
+    gameMatrix: [],
     collision: false,
   };
 
   createGameWindow(game);
-  game.cells = document.querySelectorAll('td[id^="cell_"]');
-  game.matrix = getGameMatrix(game);
+  game.cells = document.querySelectorAll("td");
+
+  game.gameMatrix = getGameMatrix(game);
+  game.domMatrix = getDomMatrix(game);
 
   createSnake(game);
   movesHandler(game);
