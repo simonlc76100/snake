@@ -46,21 +46,29 @@ function moveSnake(game, direction) {
   game.matrix[game.snake.i][game.snake.j] = 0;
   game.snake.previousI = game.snake.i;
   game.snake.previousJ = game.snake.j;
+  game.snake.nextI = game.snake.i;
+  game.snake.nextJ = game.snake.j;
 
   switch (direction) {
     case "right":
-      game.snake.j += 1;
+      game.snake.nextJ += 1;
       break;
     case "left":
-      game.snake.j -= 1;
+      game.snake.nextJ -= 1;
       break;
     case "up":
-      game.snake.i -= 1;
+      game.snake.nextI -= 1;
       break;
     case "down":
-      game.snake.i += 1;
+      game.snake.nextI += 1;
       break;
   }
+
+  isSnakeValid(game);
+  if (game.collision) return;
+
+  game.snake.i = game.snake.nextI;
+  game.snake.j = game.snake.nextJ;
   game.matrix[game.snake.i][game.snake.j] = 1;
   updateGame(game);
 }
@@ -100,6 +108,13 @@ function movesHandler(game) {
   });
 }
 
+function isSnakeValid(game) {
+  if (game.snake.nextJ > game.cellsPerRow - 1 || game.snake.nextJ < 0)
+    game.collision = true;
+  if (game.snake.nextI > game.rows - 1 || game.snake.nextI < 0)
+    game.collision = true;
+}
+
 function main() {
   let game = {
     rows: 50,
@@ -107,9 +122,11 @@ function main() {
     snake: {
       i: 10,
       j: 10,
-      previousI: 0,
-      previousJ: 0,
-      direction: null,
+      previousI: null,
+      previousJ: null,
+      nextI: null,
+      nextJ: null,
+      direction: "right",
     },
     apple: {
       i: null,
@@ -117,6 +134,7 @@ function main() {
     },
     cells: [],
     matrix: [],
+    collision: false,
   };
 
   createGameWindow(game);
@@ -127,10 +145,14 @@ function main() {
   movesHandler(game);
   createApple(game);
 
-  function gameLoop(game) {
+  function gameLoop() {
     moveSnake(game, game.snake.direction);
+    if (game.collision) {
+      clearInterval(gameInterval);
+      alert("game over!");
+    }
   }
-  setInterval(() => gameLoop(game), 50);
+  let gameInterval = setInterval(gameLoop, 50);
 }
 
 document.addEventListener("DOMContentLoaded", main);
