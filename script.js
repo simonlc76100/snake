@@ -51,31 +51,35 @@ function createApple(game) {
 }
 
 function moveSnake(game, direction) {
-  game.snake.previousI = game.snake.body[0].i;
-  game.snake.previousJ = game.snake.body[0].j;
-  game.snake.nextI = game.snake.body[0].i;
-  game.snake.nextJ = game.snake.body[0].j;
+  game.snake.previous = { i: game.snake.body[0].i, j: game.snake.body[0].j };
+  game.snake.next = { i: game.snake.body[0].i, j: game.snake.body[0].j };
 
   switch (direction) {
     case "right":
-      game.snake.nextJ += 1;
+      game.snake.next.j += 1;
       break;
     case "left":
-      game.snake.nextJ -= 1;
+      game.snake.next.j -= 1;
       break;
     case "up":
-      game.snake.nextI -= 1;
+      game.snake.next.i -= 1;
       break;
     case "down":
-      game.snake.nextI += 1;
+      game.snake.next.i += 1;
       break;
   }
 
   isSnakeValid(game);
   if (game.collision) return;
 
-  if (game.snake.nextI === game.apple.i && game.snake.nextJ === game.apple.j) {
-    game.snake.body.push({ i: game.snake.previousI, j: game.snake.previousJ });
+  if (
+    game.snake.next.i === game.apple.i &&
+    game.snake.next.j === game.apple.j
+  ) {
+    game.snake.body.push({
+      i: game.snake.previous.i,
+      j: game.snake.previous.j,
+    });
     createApple(game);
   }
 
@@ -85,7 +89,7 @@ function moveSnake(game, direction) {
 
   let previousHeadPos = { i: game.snake.body[0].i, j: game.snake.body[0].j };
 
-  game.snake.body[0] = { i: game.snake.nextI, j: game.snake.nextJ };
+  game.snake.body[0] = { i: game.snake.next.i, j: game.snake.next.j };
 
   for (let i = 1; i < game.snake.body.length; i++) {
     let previousSegmentPos = {
@@ -102,7 +106,6 @@ function moveSnake(game, direction) {
   }
 
   renderGame(game);
-  console.log(game.gameMatrix);
 }
 
 function renderGame(game) {
@@ -146,17 +149,17 @@ function movesHandler(game) {
 
 function isSnakeValid(game) {
   if (
-    game.snake.nextJ > game.cellsPerRow - 1 ||
-    game.snake.nextJ < 0 ||
-    game.snake.nextI > game.rows - 1 ||
-    game.snake.nextI < 0
+    game.snake.next.j > game.cellsPerRow - 1 ||
+    game.snake.next.j < 0 ||
+    game.snake.next.i > game.rows - 1 ||
+    game.snake.next.i < 0
   )
     game.collision = true;
 
   for (let i = 1; i < game.snake.body.length; i++) {
     if (
-      game.snake.nextI === game.snake.body[i].i &&
-      game.snake.nextJ === game.snake.body[i].j
+      game.snake.next.i === game.snake.body[i].i &&
+      game.snake.next.j === game.snake.body[i].j
     )
       game.collision = true;
   }
@@ -168,10 +171,15 @@ function main() {
     cellsPerRow: 40,
     snake: {
       body: [{ i: 10, j: 10 }],
-      previousI: null,
-      previousJ: null,
-      nextI: null,
-      nextJ: null,
+      previous: {
+        i: null,
+        j: null,
+      },
+
+      next: {
+        i: null,
+        j: null,
+      },
       direction: null,
     },
     apple: {
