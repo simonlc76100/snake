@@ -102,15 +102,19 @@ function movesHandler(game) {
   document.addEventListener("keydown", function (event) {
     switch (event.key) {
       case "ArrowRight":
+        if (game.snake.direction === "left") return;
         game.snake.direction = "right";
         break;
       case "ArrowLeft":
+        if (game.snake.direction === "right") return;
         game.snake.direction = "left";
         break;
       case "ArrowUp":
+        if (game.snake.direction === "down") return;
         game.snake.direction = "up";
         break;
       case "ArrowDown":
+        if (game.snake.direction === "up") return;
         game.snake.direction = "down";
         break;
     }
