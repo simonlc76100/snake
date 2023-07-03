@@ -36,14 +36,23 @@ function createSnake(game) {
   renderGame(game);
 }
 
+function isAppleValid(game) {
+  for (let i = 0; i < game.snake.body.length; i++) {
+    if (
+      game.snake.body[i].i === game.apple.i &&
+      game.snake.body[i].j === game.apple.j
+    )
+      return false;
+  }
+
+  return true;
+}
+
 function createApple(game) {
   do {
     game.apple.i = Math.floor(Math.random() * game.rows);
     game.apple.j = Math.floor(Math.random() * game.cellsPerRow);
-  } while (
-    game.snake.body[0].i === game.apple.i &&
-    game.snake.body[0].j === game.apple.j
-  );
+  } while (isAppleValid(game) === false);
 
   game.gameMatrix[game.apple.i][game.apple.j] = 2;
 
