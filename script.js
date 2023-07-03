@@ -31,7 +31,7 @@ function getDomMatrix(game) {
 }
 
 function createSnake(game) {
-  game.gameMatrix[game.snake.i][game.snake.j] = 1;
+  game.gameMatrix[game.snake.body[0].i][game.snake.body[0].j] = 1;
 
   renderGame(game);
 }
@@ -40,7 +40,10 @@ function createApple(game) {
   do {
     game.apple.i = Math.floor(Math.random() * game.rows);
     game.apple.j = Math.floor(Math.random() * game.cellsPerRow);
-  } while (game.snake.i === game.apple.i && game.snake.j === game.apple.j);
+  } while (
+    game.snake.body[0].i === game.apple.i &&
+    game.snake.body[0].j === game.apple.j
+  );
 
   game.gameMatrix[game.apple.i][game.apple.j] = 2;
 
@@ -48,10 +51,10 @@ function createApple(game) {
 }
 
 function moveSnake(game, direction) {
-  game.snake.previousI = game.snake.i;
-  game.snake.previousJ = game.snake.j;
-  game.snake.nextI = game.snake.i;
-  game.snake.nextJ = game.snake.j;
+  game.snake.previousI = game.snake.body[0].i;
+  game.snake.previousJ = game.snake.body[0].j;
+  game.snake.nextI = game.snake.body[0].i;
+  game.snake.nextJ = game.snake.body[0].j;
 
   switch (direction) {
     case "right":
@@ -70,16 +73,36 @@ function moveSnake(game, direction) {
 
   isSnakeValid(game);
   if (game.collision) return;
-  game.gameMatrix[game.snake.i][game.snake.j] = 0;
 
-  if (game.snake.nextI === game.apple.i && game.snake.nextJ === game.apple.j)
+  if (game.snake.nextI === game.apple.i && game.snake.nextJ === game.apple.j) {
+    game.snake.body.push({ i: game.snake.previousI, j: game.snake.previousJ });
     createApple(game);
+  }
 
-  game.snake.i = game.snake.nextI;
-  game.snake.j = game.snake.nextJ;
-  game.gameMatrix[game.snake.i][game.snake.j] = 1;
+  for (let i = 0; i < game.snake.body.length; i++) {
+    game.gameMatrix[game.snake.body[i].i][game.snake.body[i].j] = 0;
+  }
+
+  let previousHeadPos = { i: game.snake.body[0].i, j: game.snake.body[0].j };
+
+  game.snake.body[0] = { i: game.snake.nextI, j: game.snake.nextJ };
+
+  for (let i = 1; i < game.snake.body.length; i++) {
+    let previousSegmentPos = {
+      i: game.snake.body[i].i,
+      j: game.snake.body[i].j,
+    };
+
+    game.snake.body[i] = previousHeadPos;
+    previousHeadPos = previousSegmentPos;
+  }
+
+  for (let i = 0; i < game.snake.body.length; i++) {
+    game.gameMatrix[game.snake.body[i].i][game.snake.body[i].j] = 1;
+  }
 
   renderGame(game);
+  console.log(game.gameMatrix);
 }
 
 function renderGame(game) {
@@ -136,8 +159,7 @@ function main() {
     rows: 30,
     cellsPerRow: 40,
     snake: {
-      i: 10,
-      j: 10,
+      body: [{ i: 10, j: 10 }],
       previousI: null,
       previousJ: null,
       nextI: null,
