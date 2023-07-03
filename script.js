@@ -152,6 +152,14 @@ function isSnakeValid(game) {
     game.snake.nextI < 0
   )
     game.collision = true;
+
+  for (let i = 1; i < game.snake.body.length; i++) {
+    if (
+      game.snake.nextI === game.snake.body[i].i &&
+      game.snake.nextJ === game.snake.body[i].j
+    )
+      game.collision = true;
+  }
 }
 
 function main() {
@@ -164,7 +172,7 @@ function main() {
       previousJ: null,
       nextI: null,
       nextJ: null,
-      direction: "right",
+      direction: null,
     },
     apple: {
       i: null,
