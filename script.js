@@ -60,6 +60,7 @@ function createApple(game) {
 }
 
 function moveSnake(game, direction) {
+  game.snake.moving = false;
   game.snake.previous = { i: game.snake.body[0].i, j: game.snake.body[0].j };
   game.snake.next = { i: game.snake.body[0].i, j: game.snake.body[0].j };
 
@@ -135,6 +136,8 @@ function renderGame(game) {
 
 function movesHandler(game) {
   document.addEventListener("keydown", function (event) {
+    if (game.snake.moving) return;
+
     switch (event.key) {
       case "ArrowRight":
         if (game.snake.direction === "left") return;
@@ -153,6 +156,7 @@ function movesHandler(game) {
         game.snake.direction = "down";
         break;
     }
+    game.snake.moving = true;
   });
 }
 
@@ -176,10 +180,10 @@ function isSnakeValid(game) {
 
 function main() {
   let game = {
-    rows: 30,
-    cellsPerRow: 40,
+    rows: 31,
+    cellsPerRow: 41,
     snake: {
-      body: [{ i: 10, j: 10 }],
+      body: [{ i: 15, j: 20 }],
       previous: {
         i: null,
         j: null,
@@ -198,6 +202,7 @@ function main() {
     cells: [],
     domMatrix: [],
     gameMatrix: [],
+    moving: false,
     collision: false,
   };
 
